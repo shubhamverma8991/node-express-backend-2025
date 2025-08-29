@@ -1,12 +1,14 @@
 const express = require('express');
 const app = express();
 
-app.get('/', (req, res) => {
-    res.send('Hello Shubham');
+// First Middleware (Logger) Log the request method and url
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
 });
 
-app.listen(3000, () => {
-    console.log('We have Started our server on port 3000');
+app.get('/', (req, res) => {
+    res.send('Hello Shubham');
 });
 
 app.get('/about', (req, res) => {   
@@ -20,4 +22,9 @@ app.get('/about', (req, res) => {
 app.get('/contact/:name', (req, res) => {
     const name = req.params.name;
     res.send(`Hello ${name}`);
+});
+
+// Port Number
+app.listen(3000, () => {
+    console.log('We have Started our server on port 3000');
 });
