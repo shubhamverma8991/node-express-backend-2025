@@ -66,3 +66,5 @@ Thumbs.db
 # dotenv override files
 .env.*
 
+
+/generated/prisma

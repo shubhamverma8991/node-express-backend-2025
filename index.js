@@ -1,13 +1,16 @@
 const express = require("express");
 const app = express();
 // *.env config
-require('dotenv').config();
+require("dotenv").config();
 
-const PORT=process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 // * Zod Config
-const { z } = require('zod');
+const { z } = require("zod");
 
+// * for Prisma
+const { PrismaClient } = require("./generated/prisma");
+const prisma = new PrismaClient();
 
 // *Middleware to parse JSON request bodies
 app.use(express.json());
@@ -49,7 +52,7 @@ app.post("/add", (req, res) => {
 
 // * Post Request (With Validation)
 app.post("/addvalidated", (req, res) => {
-  const {message, number } = req.body;
+  const { message, number } = req.body;
   if (!message) {
     return res.status(400).json({ message: "Message is required" });
   }
@@ -60,18 +63,40 @@ app.post("/addvalidated", (req, res) => {
 });
 
 // * Post Request (With Validation using zod)
-app.post("/echo",(req,res)=>{
-    const schema=z.object({
-        message:z.string().min(1, "Message is required"),
-        number:z.number().optional(),
-    })
-    const parsedData=schema.safeParse(req.body);
-    if(!parsedData.success){
-        return res.status(400).json({ error: parsedData.error.issues });
-    }
+app.post("/echo", (req, res) => {
+  const schema = z.object({
+    message: z.string().min(1, "Message is required"),
+    number: z.number().optional(),
+  });
+  const parsedData = schema.safeParse(req.body);
+  if (!parsedData.success) {
+    return res.status(400).json({ error: parsedData.error.issues });
+  }
 
-    res.json({received:parsedData.data})
-})
+  res.json({ received: parsedData.data });
+});
+
+// * POST Request for Database
+app.post("/messages", async (req, res) => {
+  const { text } = req.body;
+  if (!text) {
+    return res.status(400).json({ error: "Text is required" });
+  }
+  try {
+    const message = await prisma.message.create({
+      data: { text },
+    });
+    res.json({ message });
+  } catch (err) {
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+// * Get Endpoint to fetch messages from DB
+app.get("/getAll", async (req, res) => {
+  const messages = await prisma.message.findMany();
+  res.json({ messages });
+});
 
 // *Port Number
 app.listen(PORT, () => {
