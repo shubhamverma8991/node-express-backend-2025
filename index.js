@@ -1,5 +1,13 @@
 const express = require("express");
 const app = express();
+// *.env config
+require('dotenv').config();
+
+const PORT=process.env.PORT || 3000;
+
+// * Zod Config
+const { z } = require('zod');
+
 
 // *Middleware to parse JSON request bodies
 app.use(express.json());
@@ -51,9 +59,23 @@ app.post("/addvalidated", (req, res) => {
   res.json({ received: req.body, message: "Data added successfully" });
 });
 
+// * Post Request (With Validation using zod)
+app.post("/echo",(req,res)=>{
+    const schema=z.object({
+        message:z.string().min(1, "Message is required"),
+        number:z.number().optional(),
+    })
+    const parsedData=schema.safeParse(req.body);
+    if(!parsedData.success){
+        return res.status(400).json({ error: parsedData.error.issues });
+    }
+
+    res.json({received:parsedData.data})
+})
+
 // *Port Number
-app.listen(3000, () => {
-  console.log("We have Started our server on port 3000");
+app.listen(PORT, () => {
+  console.log(`We have Started our server on port ${PORT}`);
 });
 
 // *404 Handler and Error Handler
