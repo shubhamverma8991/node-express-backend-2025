@@ -58,6 +58,11 @@ app.use((err, req, res, next) => {
 });
 
 
+- Added Middleware to Parse the JSON 
+// *Middleware to parse JSON request bodies
+app.use(express.json());
+
+
 - POST Request
 // * Post Request ( without validation )
 app.post("/add", (req, res) => {
