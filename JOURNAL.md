@@ -143,4 +143,14 @@ backend-journey/
   index.js
 
 
+------------------
+<!-- ! Day 4 Backend Integration -->
+
+- Add a Database ( SQLite + Prisma )
+
+npm install @prisma/client
+npm install --save-dev prisma
+
+- This creates your database schema config.
+npx prisma init --datasource-provider sqlite
 
