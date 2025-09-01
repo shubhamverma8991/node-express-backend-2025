@@ -56,3 +56,27 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Server Error');
 });
+
+
+- POST Request
+// * Post Request ( without validation )
+app.post("/add", (req, res) => {
+  //    req body will contain the parsed JSON sent by the client
+  res.json({
+    received: req.body,
+    message: "Data added successfully",
+  });
+});
+
+url - http://localhost:3000/add
+body - { "message": "Hello, API!", "number": 42 }
+
+
+- POST Request ( with Validation )
+app.post('/echo', (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: "Message is required!" });
+  }
+  res.json({ received: message });
+});
